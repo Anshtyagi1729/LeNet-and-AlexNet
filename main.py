@@ -1,13 +1,14 @@
 import torch 
 from torchvision import datasets,transforms
 from torch.utils.data import DataLoader
-from models import LeNet , AlexNet 
+from models import LeNet , AlexNet ,BNLeNet
 from utils import init_kaiming, init_xavier
 from train import train
 device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model_name="AlexNet"
+model_name="BNLeNet"
 resize=224 if model_name =="AlexNet" else 28
 transform = transforms.Compose([
+    transforms.resize(resize),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],
                          std=[0.2023, 0.1994, 0.2010])
@@ -19,11 +20,19 @@ train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
 test_loader  = DataLoader(test_dataset, batch_size=64, shuffle=False)
 
 
-model=LeNet() if model_name=="LeNet" else AlexNet()
+model=""
+if model_name=="BNLeNet":
+    model=BNLeNet()
+if model_name=="AlexNet":
+    model=AlexNet()
 if model_name=="LeNet":
+    model=LeNet()
+
+if model_name=="LeNet" or "BNLeNet":
     model.apply(init_xavier)
 else:
     model.apply(init_kaiming)
 
 train(model,train_loader,test_loader,device)
 
+q
